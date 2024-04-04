@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 
 function Test(){
     useEffect(()=>{
-        fetch("http://localhost:8080/professor/getAll")
+        fetch("http://localhost:8080/Topclass/getAll")
         .then(res=>res.json())
         .then((result)=>{
           console.log(result);
