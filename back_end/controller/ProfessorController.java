@@ -25,4 +25,9 @@ public class ProfessorController {
         return professorService.getAllProfessors();
     }
 
+    @GetMapping("/getClassesNotTaken")
+    public List<Professor> getClassesNotTaken(@RequestParam("notTaken") List<String> notTakenClasses) {
+        return professorService.getClassesNotTaken(notTakenClasses);
+    }
+
 }

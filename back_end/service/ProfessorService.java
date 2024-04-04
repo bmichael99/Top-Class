@@ -8,4 +8,6 @@ public interface ProfessorService {
     public Professor saveProfessor(Professor professor);
     public List<Professor> getAllProfessors();
 
+    List<Professor> getClassesNotTaken(List<String> notTakenClasses);
+
 }
