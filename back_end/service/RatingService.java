@@ -1,5 +1,6 @@
 package com.topclass.schedulesystem.service;
 
+import com.topclass.schedulesystem.model.Professor;
 import com.topclass.schedulesystem.model.Rating;
 
 import java.util.List;
@@ -14,4 +15,6 @@ public interface RatingService {
     public boolean ratingExistsbyID(String professor_name);
 
     public Optional<Rating> getRating(String professor_name);
+
+    public List<Rating> getManyRatings(List<String> professor_names);
 }

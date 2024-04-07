@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.swing.text.html.Option;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,7 +50,28 @@ public class RatingController {
 
             return Optional.of(rating);
         }
+    }
 
+    @GetMapping("/getRatings")
+    @ResponseBody
+    public List<Rating> getRatings(@RequestParam List<String> professor_names) throws JsonProcessingException {
+        List<Rating> selectedRatings= new ArrayList<>();
+        for (String professorName : professor_names) {
+            if (!ratingService.ratingExistsbyID(professorName)) {
+
+                String uri = "http://127.0.0.1:5000/get_Professor?professor=" + professorName.replaceAll(" ", "%20") + "&school=California%20State%20University%20San%20Marcos";
+
+                RestTemplate restTemplate = new RestTemplate();
+                String result = restTemplate.getForObject(uri, String.class);
+                ObjectMapper mapper = new ObjectMapper();
+                Rating rating = mapper.readValue(result, Rating.class);
+
+                ratingService.saveRating(rating);
+
+            }
+            selectedRatings.add(ratingService.getRating(professorName).get());
+        }
+        return selectedRatings;
 
     }
 }
