@@ -7,8 +7,8 @@ import { useEffect, useRef } from 'react';
 
 
 export const ClassSelect = () => {
-  const [selectedClasses, setSelectedClasses] = useState<{ classID: string; name: string; classTitle: string }[]>([]);
-  const [filteredClasses, setFilteredClasses] = useState<{ classID: string; name: string; classTitle: string }[]>([]);
+  const [selectedClasses, setSelectedClasses] = useState<{ classID: string; name: string; classTitle: string;}[]>([]);
+  const [filteredClasses, setFilteredClasses] = useState<{ classID: string; name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string }[]>([]);
   const [openStates, setOpenStates] = useState<{ [title: string]: boolean }>({});
   const groupedClasses = groupByTitle(filteredClasses);
     
@@ -31,7 +31,7 @@ export const ClassSelect = () => {
 
 
 
-    const ClassCard: React.FC<{ classObj: { classID: string; name: string; classTitle: string } }> = ({ classObj }) => {
+    const ClassCard: React.FC<{ classObj: { classID: string; name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string } }> = ({ classObj }) => {
       const isSelected = selectedClasses.some(selected => selected.classID === classObj.classID);
       return (
           <div style={{ height: '250px', width: '400px', border: '1px solid #ccc', borderRadius: '5px', padding: '10px', marginBottom: '10px', textAlign: 'center', listStyleType: 'none'  }}>
@@ -42,12 +42,17 @@ export const ClassSelect = () => {
                   onChange={handleClassSelection}
               />
               <strong>Title:</strong> {classObj.classID}<br />
-              <strong>name:</strong> {classObj.name}<br />
-              <strong>Name:</strong> {classObj.classTitle}<br />
+              <strong>Professor:</strong> {classObj.name}<br />
+              <strong>Description:</strong> {classObj.classTitle}<br />
+              <strong>Rating:</strong> {classObj.rating} <text>/ 5</text><br />
+              <strong>Would Take Again:</strong> {classObj.would_take_again} <text>%</text> <br />
+              <strong>Difficulty:</strong> {classObj.difficulty} <text>/ 5</text><br />
+              <strong>Total Ratings:</strong> {classObj.totalratings} <br />
           </div>
       );
   };
-  function groupByTitle(classes: { classID: string; name: string; classTitle: string }[]) {
+
+  function groupByTitle(classes: { classID: string; name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string }[]) {
     return classes.reduce((acc, classObj) => {
         const title = classObj.classID;
         if (!acc[title]) {
@@ -55,7 +60,7 @@ export const ClassSelect = () => {
         }
         acc[title].push(classObj);
         return acc;
-    }, {} as Record<string, { classID: string; name: string; classTitle: string }[]>);
+    }, {} as Record<string, { classID: string; name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string }[]>);
 }
 
   
@@ -69,17 +74,47 @@ export const ClassSelect = () => {
 // Log the array of unchecked classes to the console
       console.log('Unchecked classes:', uncheckedClasses);
       
-
+        var profRatings: any[];
       fetch(`http://localhost:8080/professor/getClassesNotTaken?notTaken=${uncheckedClasses.join(',')}`)
           .then(res => res.json())
           .then(result => {
-              setFilteredClasses(result);
+            profRatings = result;
+              //setFilteredClasses(result);
               console.log("Filtered classes from backend:", result);
           })
           .catch(error => {
               console.error('Error fetching classes:', error);
           });
+          
+          //create an array of professor names from array of professor objects
+          const names = filteredClasses.map(professor => professor.name);
+
+                fetch(`http://localhost:8080/rating/getRatings?professor_names=${names.join(',')}`)
+            .then(res => res.json())
+            .then(result => {
+                //setFilteredClasses(result);
+                console.log("222:", result);
+
+                for(var i = 0; i < result.length;i++){
+                    const foundProf = profRatings.find((prof: { name: any; }) => prof.name === result[i].name)
+                    if(foundProf){
+                        foundProf["difficulty"] = result[i].difficulty;
+                        foundProf["rating"] = result[i].rating;
+                        foundProf["totalratings"] = result[i].totalratings;
+                        foundProf["would_take_again"] = result[i].would_take_again;
+                    }
+                }
+            
+                setFilteredClasses(profRatings); 
+                console.log(filteredClasses);
+            })
+            .catch(error => {
+                console.error('333:', error);
+            });
+          
   };
+
+  
 
   const toggleList = (title: string) => {
     setOpenStates(prevOpenStates => ({
