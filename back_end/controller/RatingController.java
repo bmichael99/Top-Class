@@ -42,13 +42,28 @@ public class RatingController {
             String uri = "http://127.0.0.1:5000/get_Professor?professor=" + professor_name.replaceAll(" ", "%20") + "&school=California%20State%20University%20San%20Marcos";
 
             RestTemplate restTemplate = new RestTemplate();
-            String result = restTemplate.getForObject(uri,String.class);
-            ObjectMapper mapper = new ObjectMapper();
-            Rating rating = mapper.readValue(result, Rating.class);
+            String result = "";
 
-            ratingService.saveRating(rating);
+            try{
+                result = restTemplate.getForObject(uri,String.class);
+            } catch(Exception e) {
+                System.out.println("No results in RateMyProfessor for " + professor_name);
+            }
 
-            return Optional.of(rating);
+            if(result == ""){
+                Rating rating = new Rating(professor_name,"NA","NA","NA","NA","NA","NA");
+                return Optional.of(rating);
+            } else {
+                ObjectMapper mapper = new ObjectMapper();
+                Rating rating = mapper.readValue(result, Rating.class);
+                ratingService.saveRating(rating);
+                return Optional.of(rating);
+            }
+
+
+
+
+
         }
     }
 
@@ -62,14 +77,27 @@ public class RatingController {
                 String uri = "http://127.0.0.1:5000/get_Professor?professor=" + professorName.replaceAll(" ", "%20") + "&school=California%20State%20University%20San%20Marcos";
 
                 RestTemplate restTemplate = new RestTemplate();
-                String result = restTemplate.getForObject(uri, String.class);
-                ObjectMapper mapper = new ObjectMapper();
-                Rating rating = mapper.readValue(result, Rating.class);
+                String result = "";
 
-                ratingService.saveRating(rating);
+
+                try{
+                    result = restTemplate.getForObject(uri,String.class);
+                } catch(Exception e) {
+                    System.out.println("No results in RateMyProfessor for " + professorName);
+                }
+
+                if(result == ""){
+                    Rating rating = new Rating(professorName,"NA","NA","NA","NA","NA","NA");
+                    selectedRatings.add(rating);
+                } else {
+                    ObjectMapper mapper = new ObjectMapper();
+                    Rating rating = mapper.readValue(result, Rating.class);
+                    ratingService.saveRating(rating);
+                    selectedRatings.add(ratingService.getRating(professorName).get());
+                }
 
             }
-            selectedRatings.add(ratingService.getRating(professorName).get());
+
         }
         return selectedRatings;
 
