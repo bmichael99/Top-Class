@@ -81,36 +81,40 @@ export const ClassSelect = () => {
             profRatings = result;
               //setFilteredClasses(result);
               console.log("Filtered classes from backend:", result);
+
+              //create an array of professor names from array of professor objects
+          const names = profRatings.map(professor => professor.name);
+          
+            fetch(`http://localhost:8080/rating/getRatings?professor_names=${names.join(',')}`)
+                .then(res => res.json())
+                .then(result => {
+                    
+                    console.log("222:", result);
+
+                    for(var i = 0; i < result.length;i++){
+                        const foundProf = profRatings.filter((prof: { name: any; }) => prof.name === result[i].name)
+                        if (foundProf.length > 0) {
+                            foundProf.forEach((foundProf) => {
+                                foundProf["difficulty"] = result[i].difficulty;
+                                foundProf["rating"] = result[i].rating;
+                                foundProf["totalratings"] = result[i].totalratings;
+                                foundProf["would_take_again"] = result[i].would_take_again;
+                            });
+                        }
+                    }
+                
+                    setFilteredClasses(profRatings); 
+                    console.log(filteredClasses);
+                })
+                .catch(error => {
+                    console.error('333:', error);
+                });
           })
           .catch(error => {
               console.error('Error fetching classes:', error);
           });
           
-          //create an array of professor names from array of professor objects
-          const names = filteredClasses.map(professor => professor.name);
-
-                fetch(`http://localhost:8080/rating/getRatings?professor_names=${names.join(',')}`)
-            .then(res => res.json())
-            .then(result => {
-                //setFilteredClasses(result);
-                console.log("222:", result);
-
-                for(var i = 0; i < result.length;i++){
-                    const foundProf = profRatings.find((prof: { name: any; }) => prof.name === result[i].name)
-                    if(foundProf){
-                        foundProf["difficulty"] = result[i].difficulty;
-                        foundProf["rating"] = result[i].rating;
-                        foundProf["totalratings"] = result[i].totalratings;
-                        foundProf["would_take_again"] = result[i].would_take_again;
-                    }
-                }
-            
-                setFilteredClasses(profRatings); 
-                console.log(filteredClasses);
-            })
-            .catch(error => {
-                console.error('333:', error);
-            });
+          
           
   };
 
