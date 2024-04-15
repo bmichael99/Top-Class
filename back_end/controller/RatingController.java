@@ -93,9 +93,12 @@ public class RatingController {
                     ObjectMapper mapper = new ObjectMapper();
                     Rating rating = mapper.readValue(result, Rating.class);
                     ratingService.saveRating(rating);
-                    selectedRatings.add(ratingService.getRating(professorName).get());
+                    if(ratingService.getRating(professorName).isPresent())
+                        selectedRatings.add(ratingService.getRating(professorName).get());
                 }
 
+            } else {
+                selectedRatings.add(ratingService.getRating(professorName).get());
             }
 
         }
