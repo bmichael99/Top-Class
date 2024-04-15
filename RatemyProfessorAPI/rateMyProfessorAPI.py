@@ -36,7 +36,8 @@ def get_Professor():
     getProfessor = ratemyProfessorAPI(school_name,professor_name)
     professor = {'name': getProfessor.name, 'department': getProfessor.department, 'school': getProfessor.school.name, 
               'rating' : getProfessor.rating, 'difficulty' : getProfessor.difficulty, 'totalratings' : getProfessor.num_ratings, 'would_take_again' : round(getProfessor.would_take_again, 1)}
-    return jsonify({'professor': professor})
+    #return jsonify({'professor': professor})
+    return jsonify(professor)
 
 if __name__ == '__main__':
     app.run(debug=True)
