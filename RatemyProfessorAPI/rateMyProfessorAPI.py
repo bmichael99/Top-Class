@@ -2,6 +2,8 @@ import ratemyprofessor
 from flask import Flask, request, jsonify
 from urllib.parse import unquote
 import time
+import requests
+from bs4 import BeautifulSoup
 
 def ratemyProfessorAPI(school_name,prof_name):
     getProfessor = ratemyprofessor.get_professor_by_school_and_name(ratemyprofessor.get_school_by_name(str(school_name)), str(prof_name))
@@ -34,10 +36,37 @@ def get_Professor():
     professor_name = str(request.args.get('professor'))
     school_name = str(request.args.get('school'))
     getProfessor = ratemyProfessorAPI(school_name,professor_name)
+
+    get_request = requests.get("https://www.ratemyprofessors.com/professor/%s" % getProfessor.id)
+    news = BeautifulSoup(get_request.content, 'html.parser')
+    html_data = news.find("div", "TeacherTags__TagsContainer-sc-16vmh1y-0 dbxJaW")
+    children = html_data.findChildren("span" , recursive=False)
+    tags = []
+    for child in children:
+        tags.append(child.text)
+
     professor = {'name': getProfessor.name, 'department': getProfessor.department, 'school': getProfessor.school.name, 
-              'rating' : getProfessor.rating, 'difficulty' : getProfessor.difficulty, 'totalratings' : getProfessor.num_ratings, 'would_take_again' : round(getProfessor.would_take_again, 1)}
-    #return jsonify({'professor': professor})
+              'rating' : getProfessor.rating, 'difficulty' : getProfessor.difficulty, 'totalratings' : getProfessor.num_ratings, 'would_take_again' : round(getProfessor.would_take_again, 1), 'topTags' : tags}
     return jsonify(professor)
+
+
+@app.route('/get_Professor_Tags', methods=['GET'])
+def get_Professor_Tags():
+    professor_name = str(request.args.get('professor'))
+    school_name = str(request.args.get('school'))
+    getProfessor = ratemyProfessorAPI(school_name,professor_name)
+    
+    get_request = requests.get("https://www.ratemyprofessors.com/professor/%s" % getProfessor.id)
+    news = BeautifulSoup(get_request.content, 'html.parser')
+    html_data = news.find("div", "TeacherTags__TagsContainer-sc-16vmh1y-0 dbxJaW")
+    children = html_data.findChildren("span" , recursive=False)
+    tags = []
+    for child in children:
+        tags.append(child.text)
+    return jsonify({'name' : getProfessor.name, 'topTags' : tags})
+    
+    
+
 
 if __name__ == '__main__':
     app.run(debug=True)
