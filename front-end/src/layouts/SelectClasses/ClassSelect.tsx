@@ -8,7 +8,7 @@ import { useEffect, useRef } from 'react';
 
 export const ClassSelect = () => {
   const [selectedClasses, setSelectedClasses] = useState<{ classID: string; name: string; classTitle: string;}[]>([]);
-  const [filteredClasses, setFilteredClasses] = useState<{ classID: string; name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string }[]>([]);
+  const [filteredClasses, setFilteredClasses] = useState<{ classID: string; name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string; topTags :Array<string> }[]>([]);
   const [openStates, setOpenStates] = useState<{ [title: string]: boolean }>({});
   const groupedClasses = groupByTitle(filteredClasses);
     
@@ -31,7 +31,7 @@ export const ClassSelect = () => {
 
 
 
-    const ClassCard: React.FC<{ classObj: { classID: string; name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string } }> = ({ classObj }) => {
+    const ClassCard: React.FC<{ classObj: { classID: string; name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string; topTags :Array<string>} }> = ({ classObj }) => {
       const isSelected = selectedClasses.some(selected => selected.classID === classObj.classID);
       return (
           <div style={{ height: '250px', width: '400px', border: '1px solid #ccc', borderRadius: '5px', padding: '10px', marginBottom: '10px', textAlign: 'center', listStyleType: 'none'  }}>
@@ -44,15 +44,16 @@ export const ClassSelect = () => {
               <strong>Title:</strong> {classObj.classID}<br />
               <strong>Professor:</strong> {classObj.name}<br />
               <strong>Description:</strong> {classObj.classTitle}<br />
-              <strong>Rating:</strong> {classObj.rating} <text>/ 5</text><br />
-              <strong>Would Take Again:</strong> {classObj.would_take_again} <text>%</text> <br />
-              <strong>Difficulty:</strong> {classObj.difficulty} <text>/ 5</text><br />
+              <strong>Rating:</strong> {classObj.rating} <span>/ 5</span><br />
+              <strong>Would Take Again:</strong> {classObj.would_take_again} <span>%</span> <br />
+              <strong>Difficulty:</strong> {classObj.difficulty} <span>/ 5</span><br />
               <strong>Total Ratings:</strong> {classObj.totalratings} <br />
+              <strong>Tags:</strong> {classObj.topTags[0]}, {classObj.topTags[1]}, {classObj.topTags[2]}, {classObj.topTags[3]}, {classObj.topTags[4]} <br />
           </div>
       );
   };
 
-  function groupByTitle(classes: { classID: string; name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string }[]) {
+  function groupByTitle(classes: { classID: string; name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string; topTags :Array<string> }[]) {
     return classes.reduce((acc, classObj) => {
         const title = classObj.classID;
         if (!acc[title]) {
@@ -60,7 +61,7 @@ export const ClassSelect = () => {
         }
         acc[title].push(classObj);
         return acc;
-    }, {} as Record<string, { classID: string; name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string }[]>);
+    }, {} as Record<string, { classID: string; name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string; topTags :Array<string> }[]>);
 }
 
   
@@ -99,6 +100,7 @@ export const ClassSelect = () => {
                                 foundProf["rating"] = result[i].rating;
                                 foundProf["totalratings"] = result[i].totalratings;
                                 foundProf["would_take_again"] = result[i].would_take_again;
+                                foundProf["topTags"] = result[i].topTags;
                             });
                         }
                     }
@@ -107,7 +109,7 @@ export const ClassSelect = () => {
                     console.log(filteredClasses);
                 })
                 .catch(error => {
-                    console.error('333:', error);
+                    console.error("Error fetching ratings: " + error);
                 });
           })
           .catch(error => {
