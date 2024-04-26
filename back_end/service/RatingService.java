@@ -14,6 +14,10 @@ public interface RatingService {
 
     public boolean ratingExistsbyID(String professor_name);
 
+    public String deleteRating(String professor_name);
+
+    public String deleteallRatings();
+
     public Optional<Rating> getRating(String professor_name);
 
     public List<Rating> getManyRatings(List<String> professor_names);

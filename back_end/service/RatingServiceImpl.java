@@ -34,6 +34,18 @@ public class RatingServiceImpl implements RatingService{
     }
 
     @Override
+    public String deleteRating(String professor_name) {
+        ratingRepository.deleteById(professor_name);
+        return "Deleted " + professor_name + " ratings from database.";
+    }
+
+    @Override
+    public String deleteallRatings() {
+        ratingRepository.deleteAll();
+        return "All entries in rating table deleted";
+    }
+
+    @Override
     public Optional<Rating> getRating(String professor_name) {
         return ratingRepository.findById(professor_name);
     }
@@ -51,7 +63,7 @@ public class RatingServiceImpl implements RatingService{
                 .collect(Collectors.toList());
 
         // Logging the contents of filteredClasses
-        System.out.println("Filtered Classes:");
+        System.out.println("Filtered Professors:");
         filteredRatings.forEach(rating -> System.out.println(rating.getProfessor_name()));
 
         return filteredRatings;

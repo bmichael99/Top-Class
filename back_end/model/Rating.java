@@ -1,9 +1,12 @@
 package com.topclass.schedulesystem.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
+import java.util.List;
 
 @Entity
 public class Rating {
@@ -30,7 +33,14 @@ public class Rating {
     @JsonProperty("would_take_again")
     private String would_take_again;
 
-    public Rating(String professor_name, String department, String difficulty, String rating, String school, String total_ratings, String would_take_again) {
+    @JsonProperty("topTags")
+    @ElementCollection
+    private List<String> topTags;
+
+    public Rating() {
+    }
+
+    public Rating(String professor_name, String department, String difficulty, String rating, String school, String total_ratings, String would_take_again, List<String> topTags) {
         this.professor_name = professor_name;
         this.department = department;
         this.difficulty = difficulty;
@@ -38,10 +48,7 @@ public class Rating {
         this.school = school;
         this.total_ratings = total_ratings;
         this.would_take_again = would_take_again;
-    }
-
-    public Rating() {
-
+        this.topTags = topTags;
     }
 
     public String getProfessor_name() {
@@ -99,4 +106,14 @@ public class Rating {
     public void setWould_take_again(String would_take_again) {
         this.would_take_again = would_take_again;
     }
+
+    public List<String> getTopTags() {
+        return topTags;
+    }
+
+    public void setTopTags(List<String> topTags) {
+        this.topTags = topTags;
+    }
+
+
 }
