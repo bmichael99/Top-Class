@@ -34,7 +34,7 @@ public class RatingController {
     }
 
     @GetMapping("/getRating")
-    @ResponseBody
+
     public Optional<Rating> getRating(@RequestParam String professor_name) throws JsonProcessingException {
 
         //Check if there is already a rating for this professor, return that rating instead of calling API
