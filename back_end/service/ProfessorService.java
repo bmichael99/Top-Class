@@ -2,6 +2,7 @@ package com.topclass.schedulesystem.service;
 
 import com.topclass.schedulesystem.model.Professor;
 
+
 import java.util.List;
 public interface ProfessorService {
 
