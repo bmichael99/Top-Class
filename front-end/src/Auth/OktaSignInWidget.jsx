@@ -5,7 +5,7 @@ import { oktaConfig } from '../lib/oktaConfig';
 
 export const OktaSignInWidget = ({ onSuccess, onError }) => {
     const widgetRef = useRef();
-    
+
     useEffect(() => {
 
         if (!widgetRef.current) {
@@ -16,9 +16,8 @@ export const OktaSignInWidget = ({ onSuccess, onError }) => {
 
         widget.showSignInToGetTokens({
             el: widgetRef.current,
-            
         }).then(onSuccess).catch(onError);
-        console.log(onSuccess);
+
         return () => widget.remove();
     }, [onSuccess, onError]);
 

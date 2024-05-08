@@ -7,7 +7,7 @@ import { ClassSelect } from './layouts/SelectClasses/ClassSelect';
 import { Redirect, Route, Switch, useHistory } from 'react-router-dom';
 import { oktaConfig } from './lib/oktaConfig';
 import { OktaAuth, toRelativeUrl } from '@okta/okta-auth-js';
-import { Security, LoginCallback } from '@okta/okta-react';
+import { Security, LoginCallback, SecureRoute } from '@okta/okta-react';
 import {Schedule} from './layouts/Schedule/Schedule';
 import LoginWidget from './Auth/LoginWidget';
 
@@ -35,9 +35,9 @@ export const App = () => {
           <Route path='/' exact>
             <Redirect to='/home' />
           </Route>
-          <Route path='/search'>
+          <SecureRoute path='/search'>
             <ClassSelect />
-          </Route>
+          </SecureRoute>
           <Route path='/schedule'>
             <Schedule />
           </Route>

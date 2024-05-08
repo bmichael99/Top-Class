@@ -8,8 +8,7 @@ selectedProfessors = [];
 interface MotionCardProps {
   classObj: {
     classID: string;
-    name: string;
-    classTitle: string;
+    professor_name: string;
     difficulty: string;
     rating: string;
     totalratings: string;
@@ -19,23 +18,7 @@ interface MotionCardProps {
 }
 
 const MotionCard: React.FC<MotionCardProps> = ({ classObj }) => {
-  const [isClicked, setIsClicked] = useState(false);
-  
-  
 
-  const handleClick = () => {
-    setIsClicked(!isClicked);
-    if(!isClicked){
-      selectedProfessors.push(classObj);
-      console.log(selectedProfessors);
-    }else{
-      const index = selectedProfessors.findIndex(prof => prof.classID === classObj.classID);
-      if (index > -1) {
-        selectedProfessors.splice(index, 1);
-      }
-    }
-    
-  };
 
   const getRatingColor = (rating: string) => {
     const numericRating = parseFloat(rating);
@@ -53,7 +36,6 @@ const MotionCard: React.FC<MotionCardProps> = ({ classObj }) => {
   return (
     <motion.div
       className='motion-card-container'
-      onClick={handleClick}
     >
     <motion.div
       className="motion-card"
@@ -65,12 +47,12 @@ const MotionCard: React.FC<MotionCardProps> = ({ classObj }) => {
         position: "relative",
         alignItems: "center",
         display: "flex",
-        width: isClicked ? '600px' : '600px',
-        height: isClicked ? '100px' : '100px',
+        width: '600px',
+        height: '100px',
         backgroundColor:'0b94e3',
         borderRadius: '1rem',
         
-        border: isClicked ? '4px solid red' : '1px solid #ccc', // Change border here when clicked
+        border:'1px solid #ccc', // Change border here when clicked
         }}
         // onClick={handleClick}
     >
@@ -110,7 +92,7 @@ const MotionCard: React.FC<MotionCardProps> = ({ classObj }) => {
                     left: "95px", // Specify the distance from the right edge
                     marginTop: "-34px" }}
             >
-                {classObj.name}
+                {classObj.professor_name}
             </strong>
         </span>
           

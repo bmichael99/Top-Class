@@ -1,7 +1,7 @@
-import { NavLink, Link } from 'react-router-dom'
-import { useOktaAuth } from '@okta/okta-react';
+import { NavLink, Link, useHistory } from 'react-router-dom'
+import { useOktaAuth, OktaContext } from '@okta/okta-react';
 import { SpinnerLoading } from '../Utils/SpinnerLoading';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useEffect, useRef } from 'react';
 import MotionCard from './MotionCard';
 import {selectedProfessors} from "./MotionCard"
@@ -9,6 +9,8 @@ import {selectedProfessors} from "./MotionCard"
 
 
 export const ClassSelect = () => {
+  const { authState } = useOktaAuth();
+
   const [selectedClasses, setSelectedClasses] = useState<{ classID: string; name: string; classTitle: string;}[]>([]);
   const [filteredClasses, setFilteredClasses] = useState<{ classID: string; name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string; topTags :Array<string> }[]>([]);
   const [openStates, setOpenStates] = useState<{ [title: string]: boolean }>({});
@@ -30,6 +32,8 @@ export const ClassSelect = () => {
         );
     }
 };
+
+
 
 
 
@@ -66,9 +70,15 @@ export const ClassSelect = () => {
     }, {} as Record<string, { classID: string; name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string; topTags :Array<string> }[]>);
 }
 
+const handleMotionCardClick = () => {
+  console.log("sup");
+  //setSelectedMotionCards((prevSelected) => [...prevSelected, classObj]);
+};
+
   
 
     const onClick = () => {
+      
       // Create an array of classes from unchecked checkboxes
     const uncheckedClasses = Array.from(document.querySelectorAll('input[type="checkbox"]'))
     .filter((checkbox: Element) => !(checkbox as HTMLInputElement).checked)
@@ -121,6 +131,39 @@ export const ClassSelect = () => {
           
           
           
+  };
+  let history = useHistory();
+  const submitSchedule = () => {
+    //const oktaContext = useContext(OktaContext);
+    
+    
+    const userData = selectedProfessors.map(professor => ({
+      classID: professor.classID,
+      professor_name: professor.name
+  }));
+
+  //console.log(JSON.stringify(userData));
+  if(authState){
+      fetch(`http://localhost:8080/user/addUser`, {
+      method: 'POST',
+      headers: {
+          Authorization: `Bearer ${authState.accessToken?.accessToken}`,
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData)
+      })
+      .then(result => {
+          
+          //console.log("222:", result);
+          history.push('/schedule');
+      })
+      .catch(error => {
+          console.error("Error fetching ratings: " + error);
+      });
+  }
+  
+    
+    
   };
 
   
@@ -185,7 +228,7 @@ export const ClassSelect = () => {
                               <ul style={{ listStyleType: 'none', textAlign: 'center' }}>
                                   {classes.map((classObj, index) => (
                                       <li key={index} style={{ display: 'inline-block', margin: '0 10px' }}>
-                                          <MotionCard classObj={classObj} />
+                                          <MotionCard classObj={classObj} onClick={handleMotionCardClick}/>
                                       </li>
                                   ))}
                               </ul>
@@ -199,8 +242,10 @@ export const ClassSelect = () => {
                 ) : (
                     <p>No classes to display</p>
                 )}
-                <Link className='btn main-color btn-lg text-white' to='/Schedule'>
-                        Build Schedule</Link>
+                <button className='btn main-color btn-lg text-white' onClick={submitSchedule}>
+                Build Schedule
+                </button>
+                
             </div>
             
         

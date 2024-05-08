@@ -16,25 +16,22 @@ interface MotionCardProps {
     would_take_again: string;
     topTags: Array<String>
   };
+  onClick: () => void;
 }
 
-const MotionCard: React.FC<MotionCardProps> = ({ classObj }) => {
+
+
+const MotionCard: React.FC<MotionCardProps> = ({ classObj, onClick }) => {
   const [isClicked, setIsClicked] = useState(false);
   
   
 
   const handleClick = () => {
-    setIsClicked(!isClicked);
-    if(!isClicked){
-      selectedProfessors.push(classObj);
-      console.log(selectedProfessors);
-    }else{
-      const index = selectedProfessors.findIndex(prof => prof.classID === classObj.classID);
-      if (index > -1) {
-        selectedProfessors.splice(index, 1);
-      }
-    }
-    
+
+
+
+    setIsClicked(!isClicked)
+    onClick();
   };
 
   const getRatingColor = (rating: string) => {

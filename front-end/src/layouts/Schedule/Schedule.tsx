@@ -9,8 +9,9 @@ import {selectedProfessors} from "./MotionCard"
 
 
 export const Schedule = () => {
-  const [selectedClasses, setSelectedClasses] = useState<{ classID: string; name: string; classTitle: string;}[]>([]);
-  const [filteredClasses, setFilteredClasses] = useState<{ classID: string; name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string; topTags :Array<string> }[]>([]);
+    const { authState } = useOktaAuth();
+  const [selectedClasses, setSelectedClasses] = useState<{ classID: string; professor_name: string; classTitle: string;}[]>([]);
+  const [filteredClasses, setFilteredClasses] = useState<{ classID: string; professor_name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string; topTags :Array<string> }[]>([]);
   const [openStates, setOpenStates] = useState<{ [title: string]: boolean }>({});
   const groupedClasses = groupByTitle(filteredClasses);
     
@@ -33,7 +34,7 @@ export const Schedule = () => {
 
 
 
-    const ClassCard: React.FC<{ classObj: { classID: string; name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string; topTags :Array<string>} }> = ({ classObj }) => {
+    const ClassCard: React.FC<{ classObj: { classID: string; professor_name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string; topTags :Array<string>} }> = ({ classObj }) => {
       const isSelected = selectedClasses.some(selected => selected.classID === classObj.classID);
       return (
           <div style={{ height: '250px', width: '400px', border: '1px solid #ccc', borderRadius: '5px', padding: '10px', marginBottom: '10px', textAlign: 'center', listStyleType: 'none'  }}>
@@ -44,7 +45,7 @@ export const Schedule = () => {
                   onChange={handleClassSelection}
               />
               <strong>Title:</strong> {classObj.classID}<br />
-              <strong>Professor:</strong> {classObj.name}<br />
+              <strong>Professor:</strong> {classObj.professor_name}<br />
               <strong>Description:</strong> {classObj.classTitle}<br />
               <strong>Rating:</strong> {classObj.rating} <span>/ 5</span><br />
               <strong>Would Take Again:</strong> {classObj.would_take_again} <span>%</span> <br />
@@ -55,7 +56,7 @@ export const Schedule = () => {
       );
   };
 
-  function groupByTitle(classes: { classID: string; name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string; topTags :Array<string> }[]) {
+  function groupByTitle(classes: { classID: string; professor_name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string; topTags :Array<string> }[]) {
     return classes.reduce((acc, classObj) => {
         const title = classObj.classID;
         if (!acc[title]) {
@@ -63,12 +64,13 @@ export const Schedule = () => {
         }
         acc[title].push(classObj);
         return acc;
-    }, {} as Record<string, { classID: string; name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string; topTags :Array<string> }[]>);
+    }, {} as Record<string, { classID: string; professor_name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string; topTags :Array<string> }[]>);
 }
 
   
-
+    var profNames: any[];
     const onClick = () => {
+        
       // Create an array of classes from unchecked checkboxes
     const uncheckedClasses = Array.from(document.querySelectorAll('input[type="checkbox"]'))
     .filter((checkbox: Element) => !(checkbox as HTMLInputElement).checked)
@@ -79,73 +81,61 @@ export const Schedule = () => {
       //console.log("selected Professors:" + selectedProfessors[0].classID);
       
 
+        if(authState){
+            fetch(`http://localhost:8080/user/getUser`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${authState.accessToken?.accessToken}`,
+                'Content-Type': 'application/json',
+            }
+            })
+            .then(res => res.json())
+            .then(result => {
+                
+                profNames = result.data;
+                const names = profNames.map(professor => professor.professor_name);
+                const classIDs = profNames.map(professor => professor.classID);
+                //console.log("names:" + names);
+                //console.log("classIDs:" + classIDs);
+                //console.log("222:", result);
 
-      fetch(`http://localhost:8080/user/getUser?professor_names=`)
-                .then(res => res.json())
-                .then(result => {
+                
                     
-                    console.log("222:", result);
+                        fetch(`http://localhost:8080/rating/getRatings?professor_names=${names.join(',')}`)
+                            .then(res => res.json())
+                            .then(result => {
+                                
+                                console.log("222:", result);
 
-                    for(var i = 0; i < result.length;i++){
-                        const foundProf = profRatings.filter((prof: { name: any; }) => prof.name === result[i].name)
-                        if (foundProf.length > 0) {
-                            foundProf.forEach((foundProf) => {
-                                foundProf["difficulty"] = result[i].difficulty;
-                                foundProf["rating"] = result[i].rating;
-                                foundProf["totalratings"] = result[i].totalratings;
-                                foundProf["would_take_again"] = result[i].would_take_again;
-                                foundProf["topTags"] = result[i].topTags;
+                                for(var i = 0; i < result.length;i++){
+                                    const foundProf = profNames.filter((prof: { professor_name: any; }) => prof.professor_name === result[i].name)
+                                    if (foundProf.length > 0) {
+                                        foundProf.forEach((foundProf) => {
+                                            foundProf["difficulty"] = result[i].difficulty;
+                                            foundProf["rating"] = result[i].rating;
+                                            foundProf["totalratings"] = result[i].totalratings;
+                                            foundProf["would_take_again"] = result[i].would_take_again;
+                                            foundProf["topTags"] = result[i].topTags;
+                                        });
+                                    }
+                                }
+                            
+                                setFilteredClasses(profNames); 
+                                console.log(filteredClasses);
+                            })
+                            .catch(error => {
+                                console.error("Error fetching ratings: " + error);
                             });
-                        }
-                    }
-                
-                    setFilteredClasses(profRatings); 
-                    console.log(filteredClasses);
-                })
-                .catch(error => {
-                    console.error("Error fetching ratings: " + error);
-                });
-                
-        var profRatings: any[];
-      fetch(`http://localhost:8080/professor/getClassesNotTaken?notTaken=${uncheckedClasses.join(',')}`)
-          .then(res => res.json())
-          .then(result => {
-            profRatings = result;
-              //setFilteredClasses(result);
-              console.log("Filtered classes from backend:", result);
-
-              //create an array of professor names from array of professor objects
-          const names = profRatings.map(professor => professor.name);
-          
-            fetch(`http://localhost:8080/rating/getRatings?professor_names=${names.join(',')}`)
-                .then(res => res.json())
-                .then(result => {
                     
-                    console.log("222:", result);
-
-                    for(var i = 0; i < result.length;i++){
-                        const foundProf = profRatings.filter((prof: { name: any; }) => prof.name === result[i].name)
-                        if (foundProf.length > 0) {
-                            foundProf.forEach((foundProf) => {
-                                foundProf["difficulty"] = result[i].difficulty;
-                                foundProf["rating"] = result[i].rating;
-                                foundProf["totalratings"] = result[i].totalratings;
-                                foundProf["would_take_again"] = result[i].would_take_again;
-                                foundProf["topTags"] = result[i].topTags;
-                            });
-                        }
-                    }
                 
-                    setFilteredClasses(profRatings); 
-                    console.log(filteredClasses);
-                })
-                .catch(error => {
-                    console.error("Error fetching ratings: " + error);
-                });
-          })
-          .catch(error => {
-              console.error('Error fetching classes:', error);
-          });
+            })
+            .catch(error => {
+                console.error("Error fetching ratings: " + error);
+            });
+        }
+      
+                
+        
           
           
           
