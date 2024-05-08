@@ -35,9 +35,9 @@ public class UserController {
 
     @PostMapping("/addUser")
     public String addUserData(@RequestHeader(value = "Authorization") String token, @RequestBody List<userData> data) throws JsonProcessingException {
-        //String userEmail = ExtractJWT.payloadJWTExtraction(token);
-
-        String userEmail = token;
+        String userEmail = ExtractJWT.payloadJWTExtraction(token);
+        System.out.println(userEmail);
+        //String userEmail = token;
         User user = new User(userEmail,data);
 
         if(data != null){
@@ -50,8 +50,8 @@ public class UserController {
 
     @GetMapping("/getUser")
     public Optional<User> getUserData(@RequestHeader(value = "Authorization") String token) throws JsonProcessingException {
-        //String userEmail = ExtractJWT.payloadJWTExtraction(token);
-        String userEmail = token;
+        String userEmail = ExtractJWT.payloadJWTExtraction(token);
+        //String userEmail = token;
         return userService.getByID(userEmail);
 
 
