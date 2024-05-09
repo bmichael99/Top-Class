@@ -4,18 +4,23 @@ import { SpinnerLoading } from '../Utils/SpinnerLoading';
 import React, { useContext, useState } from 'react';
 import { useEffect, useRef } from 'react';
 import MotionCard from './MotionCard';
-import {selectedProfessors} from "./MotionCard"
+//import {selectedProfessors} from "./MotionCard"
 
-
+var selectedProfessors: any[]
+    selectedProfessors = [];
 
 export const ClassSelect = () => {
+    
+    
+
   const { authState } = useOktaAuth();
 
   const [selectedClasses, setSelectedClasses] = useState<{ classID: string; name: string; classTitle: string;}[]>([]);
   const [filteredClasses, setFilteredClasses] = useState<{ classID: string; name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string; topTags :Array<string> }[]>([]);
   const [openStates, setOpenStates] = useState<{ [title: string]: boolean }>({});
   const groupedClasses = groupByTitle(filteredClasses);
-    
+
+  const [showButton, setshowButton] = useState(false);
 
 
     
@@ -70,14 +75,30 @@ export const ClassSelect = () => {
     }, {} as Record<string, { classID: string; name: string; classTitle: string; difficulty :string; rating :string; totalratings :string; would_take_again :string; topTags :Array<string> }[]>);
 }
 
-const handleMotionCardClick = () => {
-  console.log("sup");
-  //setSelectedMotionCards((prevSelected) => [...prevSelected, classObj]);
+
+
+const handleMotionCardClick = (classObj: any) => {
+    
+      
+      
+    
+    const index = selectedProfessors.findIndex(prof => prof.classID === classObj.classID && prof.name === classObj.name);
+      if (index > -1) {
+        selectedProfessors.splice(index, 1);
+      } else {
+        selectedProfessors.push(classObj);
+      }
+
+      console.log("selectedProfessors " + selectedProfessors);
 };
 
-  
+
 
     const onClick = () => {
+        //empty this array to allow for new schedule
+        selectedProfessors = [];
+
+        setshowButton(true);
       
       // Create an array of classes from unchecked checkboxes
     const uncheckedClasses = Array.from(document.querySelectorAll('input[type="checkbox"]'))
@@ -166,9 +187,17 @@ const handleMotionCardClick = () => {
     
   };
 
-  
+
+
+
 
   const toggleList = (title: string) => {
+    console.log("TITLE: " + title);
+    const index = selectedProfessors.findIndex(prof => prof.classID === title);
+      if (index > -1) {
+        console.log("removed professors teaching " + title);
+        selectedProfessors.splice(index, 1);
+      }
     setOpenStates(prevOpenStates => ({
         ...prevOpenStates,
         [title]: !prevOpenStates[title]
@@ -242,9 +271,9 @@ const handleMotionCardClick = () => {
                 ) : (
                     <p>No classes to display</p>
                 )}
-                <button className='btn main-color btn-lg text-white' onClick={submitSchedule}>
-                Build Schedule
-                </button>
+
+                {showButton && <button className='btn main-color btn-lg text-white' onClick={submitSchedule}> Submit Selection </button>}
+                
                 
             </div>
             

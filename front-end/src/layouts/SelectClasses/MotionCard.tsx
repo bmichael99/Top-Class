@@ -2,9 +2,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 
-export var selectedProfessors: any[]
-selectedProfessors = [];
-
+//export var selectedProfessors: any[]
+//selectedProfessors = [];
+//export const [selectedProfessors, setSelectedProfessors] = useState([]);
 interface MotionCardProps {
   classObj: {
     classID: string;
@@ -16,12 +16,14 @@ interface MotionCardProps {
     would_take_again: string;
     topTags: Array<String>
   };
-  onClick: () => void;
+  onClick: (classObj: any) => void;
 }
 
 
 
 const MotionCard: React.FC<MotionCardProps> = ({ classObj, onClick }) => {
+  //const [selectedProfessors, setSelectedProfessors] = useState([]);
+
   const [isClicked, setIsClicked] = useState(false);
   
   
@@ -31,7 +33,7 @@ const MotionCard: React.FC<MotionCardProps> = ({ classObj, onClick }) => {
 
 
     setIsClicked(!isClicked)
-    onClick();
+    onClick(classObj);
   };
 
   const getRatingColor = (rating: string) => {
