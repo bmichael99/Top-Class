@@ -1,5 +1,5 @@
-Final Project for Software Engineering 370.
-Created by Josue N, Michael B, and Rutilo M
+Final Project for Software Engineering 370.  
+Created by Josue N, Michael B, and Rutilo M  
 
 ![Screenshot](TopClass-logos_white.png)
 
