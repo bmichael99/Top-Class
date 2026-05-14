@@ -1,3 +1,8 @@
+Final Project for Software Engineering 370.
+Created by Josue N, Michael B, and Rutilo M
+
+![Screenshot](TopClass-logos_white.png)
+
 # Introduction
 ### Purpose 
 TopClass is a startup looking to help get CSUSM students to graduation. The mission of TopClass is to help students navigate building their class schedules in preparation for graduation within their Major. 
@@ -22,6 +27,7 @@ The dependencies that will be included in this project include the Rate My Profe
 ### Design, Development, and Implementation Methods
 For building the project, the IDE to be used is Eclipse/IntelliJ. We will use Github to synchronize the development of the project and to back up project data. Our team follows the incremental model of software development in order to maximize the efficiency of the software development process.CSUSM will be the intellectual owner of the design documentation and will be reviewed by our programming group. We will follow this specific activity chart:
 
+![Screenshot](Workflow.png)
 
 
 
